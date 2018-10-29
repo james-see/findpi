@@ -11,7 +11,7 @@ Also, arp only works for devices you have seen previously, so you could easily m
 
 ## Usage
 
-**Must Use SUDO**
+***Must Use SUDO***
 
 `sudo finder.py 32` the number at the end is the number of threads to use, with the default being 64 will return the following:
 
