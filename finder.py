@@ -8,6 +8,8 @@ import queue
 import threading
 from subprocess import check_output
 import sys
+import time
+start_time = time.time()
 
 #define a worker function
 def worker(queue_item):
@@ -25,9 +27,13 @@ def worker(queue_item):
             # pi at time of writing has these first three for Mac Address
             if "B8:27:EB" in str(data):
                 print(f'Found pi: {ip_address}')
+            queue_item.task_done()
 
         except queue.Empty:
             queue_full = False
+
+            
+
 
 
 def main():
@@ -44,7 +50,14 @@ def main():
     else:
         limit = 1
     if limit == 1:
-        workers(macme)
+        checkip = macme.rsplit('.', 1)[0] + f'.{currentnum}'
+        data = check_output(f"nmap -sP {checkip}", shell=True)
+        if "B8:27:EB" in str(data):
+            print(f'Found pi: {macme}')
+        else:
+            print(f'{macme} is not a pi device')
+        print("--- %s seconds ---" % (time.time() - start_time))
+        exit()
     else:
         ip_list = []
         while currentnum <= limit:
@@ -59,6 +72,9 @@ def main():
     for i in range(thread_count):
         t = threading.Thread(target=worker, args = (q,))
         t.start()
+    q.join()
+    print("--- %s seconds ---" % (time.time() - start_time))
 if __name__ == "__main__":
     main()
+    
     
