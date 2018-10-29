@@ -11,7 +11,7 @@ Also, arp only works for devices you have seen previously, so you could easily m
 
 ## Usage
 
-both finder.py and conscan.py use multithreading to get the job done, conscan is just a more *modern* implementation
+both `finder.py` and `conscan.py` use multithreading to get the job done, conscan is just a more *modern* implementation
 
 ***NOTE: Must Use SUDO***
 
