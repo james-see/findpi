@@ -1,5 +1,13 @@
 # find-pi
-Find all the raspberry pi devices on your network really fast using multithreading in Python 3.x
+
+## What
+Find all the raspberry pi devices on your network really fast using multithreading in Python 3.x and find them fast. 
+
+## Why
+
+I was sick of waiting forever for the arp / nmap commands to work single-threaded. 
+
+Also, arp only works for devices you have seen previously, so you could easily miss things.
 
 ## Usage
 
