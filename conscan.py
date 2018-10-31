@@ -1,7 +1,7 @@
 """Uses brand new features of Python 3"""
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
-import sys
+import sys, os
 import time
 from subprocess import check_output
 start_time = time.time()
@@ -19,6 +19,8 @@ def checker(ip_address):
 def main():
     # create as many threads as you want and set from terminal as parameter
     thread_count = 48
+    if not os.geteuid() == 0:
+        sys.exit('This script must be run as root (or with \'sudo\')!')
     if len(sys.argv) > 1:
         thread_count = int(sys.argv[1])
     currentnum = 1
