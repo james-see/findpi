@@ -7,7 +7,7 @@ Date: 29 October 2018
 import queue
 import threading
 from subprocess import check_output
-import sys
+import sys, os
 import time
 start_time = time.time()
 
@@ -39,6 +39,8 @@ def worker(queue_item):
 def main():
     # create as many threads as you want and set from terminal as parameter
     thread_count = 64
+    if not os.geteuid() == 0:
+        sys.exit('This script must be run as root (or with \'sudo\')!')
     if len(sys.argv) > 1:
         thread_count = int(sys.argv[1])
     currentnum = 1
