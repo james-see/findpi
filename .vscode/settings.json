@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "/Users/jc/.local/share/virtualenvs/find-pi-KuHazbn0/bin/python"
+    "python.pythonPath": "/Users/jc/.local/share/virtualenvs/find-pi-KuHazbn0/bin/python",
+    "python.linting.enabled": true
 }

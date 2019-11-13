@@ -1,10 +1,12 @@
 """Uses brand new features of Python 3"""
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
-import sys, os
+import os
+import sys
 import time
 from subprocess import check_output
 start_time = time.time()
+
 
 def checker(ip_address):
     # Your actual program here. Using threading.Lock() if necessary
@@ -46,13 +48,13 @@ def main():
             checkip = macme.rsplit('.', 1)[0] + f'.{currentnum}'
             ip_list.append(checkip)
             currentnum = currentnum + 1
-    with ThreadPoolExecutor(max_workers = thread_count) as executor: 
-        futures = {executor.submit(checker, ip) for ip in ip_list}
+    with ThreadPoolExecutor(max_workers=thread_count) as executor: 
+        {executor.submit(checker, ip) for ip in ip_list}
 
         # as_completed() gives you the threads once finished
-        for f in as_completed(futures):
-            # Get the results 
-            rs = f.result()
+        # for f in as_completed(futures):
+        # Get the results
+        # rs = f.result()
     print("--- %s seconds ---" % (time.time() - start_time))
 
 if __name__ == "__main__":
