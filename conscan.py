@@ -41,17 +41,17 @@ def main():
     if len(sys.argv) > 1:
         thread_count = int(sys.argv[1])
     currentnum = 1
-    macme = input('What net to check? (default 10.2.2.0/24): ') or '10.2.2.0/24'
-    print(f'\nChecking for delicious pi around {macme}...')
-    if macme.endswith('/24'):
+    userinput = input('What net to check? (default 10.2.2.0/24): ') or '10.2.2.0/24'
+    print(f'\nChecking for delicious pi around {userinput}...')
+    if userinput.endswith('/24'):
         limit = 255
     if limit == 1:
-        checkip = macme.rsplit('.', 1)[0] + f'.{currentnum}'
+        checkip = userinput.rsplit('.', 1)[0] + f'.{currentnum}'
         checker(checkip)
         print("--- %s seconds ---" % (time.time() - start_time))
         sys.exit(0)
     ip_list = []
-    ip_list.extend([macme.rsplit('.', 1)[0] + f'.{i}' for i in range(limit)])
+    ip_list.extend([userinput.rsplit('.', 1)[0] + f'.{i}' for i in range(limit)])
     with ThreadPoolExecutor(max_workers=thread_count) as executor:
         {executor.submit(checker, ip) for ip in ip_list}
     print("--- %s seconds ---" % (time.time() - start_time))
