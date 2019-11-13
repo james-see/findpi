@@ -15,8 +15,17 @@ def checker(ip_address):
         print(f'Found pi: {ip_address}')
     else:
         return
-    return 
+    return
 
+logo = """
+  ______ _____ _   _ _____  _____ _____
+ |  ____|_   _| \ | |  __ \|  __ \_   _|
+ | |__    | | |  \| | |  | | |__) || |
+ |  __|   | | | . ` | |  | |  ___/ | |
+ | |     _| |_| |\  | |__| | |    _| |_
+ |_|    |_____|_| \_|_____/|_|   |_____|
+
+"""
 
 def main():
     # create as many threads as you want and set from terminal as parameter
@@ -26,9 +35,8 @@ def main():
     if len(sys.argv) > 1:
         thread_count = int(sys.argv[1])
     currentnum = 1
-    macme = input('What network do you want to check? (10.2.2.0/24): ')
-    if macme == '':
-        macme = '10.2.2.0/24'
+    macme = input('What net to check? (default 10.2.2.0/24): ') or '10.2.2.0/24'
+    print(f'\nChecking each ip in {macme}...')
     if macme.endswith('/24'):
         limit = 255
     else:
@@ -48,7 +56,7 @@ def main():
             checkip = macme.rsplit('.', 1)[0] + f'.{currentnum}'
             ip_list.append(checkip)
             currentnum = currentnum + 1
-    with ThreadPoolExecutor(max_workers=thread_count) as executor: 
+    with ThreadPoolExecutor(max_workers=thread_count) as executor:
         {executor.submit(checker, ip) for ip in ip_list}
 
         # as_completed() gives you the threads once finished
@@ -58,4 +66,5 @@ def main():
     print("--- %s seconds ---" % (time.time() - start_time))
 
 if __name__ == "__main__":
+    print(logo)
     main()
