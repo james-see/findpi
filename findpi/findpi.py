@@ -6,7 +6,7 @@ import time
 from subprocess import check_output
 start_time = time.time()
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 
 def checker(ip_address):
@@ -22,6 +22,7 @@ def checker(ip_address):
     else:
         return
     return
+
 
 logo = """
   ______ _____ _   _ _____  _____ _____
@@ -43,7 +44,8 @@ def main():
     if len(sys.argv) > 1:
         thread_count = int(sys.argv[1])
     currentnum = 1
-    userinput = input('What net to check? (default 10.2.2.0/24): ') or '10.2.2.0/24'
+    userinput = input(
+        'What net to check? (default 10.2.2.0/24): ') or '10.2.2.0/24'
     print(f'\nChecking for delicious pi around {userinput}...')
     if userinput.endswith('/24'):
         limit = 255
@@ -53,10 +55,12 @@ def main():
         print("--- %s seconds ---" % (time.time() - start_time))
         sys.exit(0)
     ip_list = []
-    ip_list.extend([userinput.rsplit('.', 1)[0] + f'.{i}' for i in range(limit)])
+    ip_list.extend([userinput.rsplit('.', 1)[0] +
+                    f'.{i}' for i in range(limit)])
     with ThreadPoolExecutor(max_workers=thread_count) as executor:
         {executor.submit(checker, ip) for ip in ip_list}
     print("--- %s seconds ---" % (time.time() - start_time))
+
 
 if __name__ == "__main__":
     print(logo)
