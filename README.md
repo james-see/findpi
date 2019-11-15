@@ -12,7 +12,7 @@ Also, arp only works for devices you have seen previously, so you could easily m
 
 ## Usage
 
-`sudo python3 conscan.py` use multithreading to get the job done
+`pip3 install findpi` then `sudo findpi` use multithreading to get the job done.
 
 ***NOTE: Must Use SUDO***
 
