@@ -6,6 +6,8 @@ import time
 from subprocess import check_output
 start_time = time.time()
 
+__version__ = "1.0.0"
+
 
 def checker(ip_address):
     """
