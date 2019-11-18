@@ -1,12 +1,13 @@
 """Uses brand new features of Python 3"""
 from concurrent.futures import ThreadPoolExecutor
 import os
+import socket
 import sys
 import time
 from subprocess import check_output
 start_time = time.time()
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 
 def checker(ip_address):
@@ -36,6 +37,9 @@ logo = """
 
 
 def main():
+    # get current ip hopefully and convert to /24
+    currentip = (([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")] or [[(s.connect(("8.8.8.8", 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) + ["no IP found"])[0]
+    currentip = currentip.rsplit('.', 1)[0] + '.0/24'
     # create as many threads as you want and set from terminal as parameter
     thread_count = 48
     limit = 1
@@ -45,7 +49,7 @@ def main():
         thread_count = int(sys.argv[1])
     currentnum = 1
     userinput = input(
-        'What net to check? (default 10.2.2.0/24): ') or '10.2.2.0/24'
+        f'What net to check? (default {currentip}): ') or currentip
     print(f'\nChecking for delicious pi around {userinput}...')
     if userinput.endswith('/24'):
         limit = 255
