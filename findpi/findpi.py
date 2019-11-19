@@ -7,7 +7,7 @@ import time
 from subprocess import check_output
 
 
-__version__ = "1.0.3"
+__version__ = "1.0.4"
 
 
 def checker(ip_address):
@@ -18,7 +18,7 @@ def checker(ip_address):
     Prints: found ip of pi if found
     """
     data = check_output(f"nmap -sP {ip_address}", shell=True)
-    if "B8:27:EB" in str(data):
+    if ("B8:27:EB" in str(data)) or ("DC:A6:32" in str(data)):
         print(f'Found pi: {ip_address}')
     else:
         return
