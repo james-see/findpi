@@ -40,4 +40,4 @@ Found pi: 10.2.2.137
 
 1. If you se the threads too high for your system (should be a factor of number of cores) you will start to see timeout errors like the following `QUITTING! dnet: Failed to open device en0`. The mitigation is to lower the number of threads or leave it at the default.
 
-Enjoy!
+
