@@ -5,9 +5,9 @@ import socket
 import sys
 import time
 from subprocess import check_output
-start_time = time.time()
 
-__version__ = "1.0.2"
+
+__version__ = "1.0.3"
 
 
 def checker(ip_address):
@@ -50,6 +50,7 @@ def main():
     currentnum = 1
     userinput = input(
         f'What net to check? (default {currentip}): ') or currentip
+    start_time = time.time()
     print(f'\nChecking for delicious pi around {userinput}...')
     if userinput.endswith('/24'):
         limit = 255
