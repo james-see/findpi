@@ -4,6 +4,15 @@
 
 Find all the raspberry pi devices on your network really fast using multithreading in Python 3.x and find them fast. 
 
+## Stats
+
+Ok, so to compare this to just running nmap vs. findpi:
+
+|               | run 1       | run 2       | run 3       | average    |
+|---------------|-------------|-------------|-------------|------------|
+| nmap v7.80    | 6.007 total | 5.679 total | 4.633 total | 5.44 total |
+| findpi v1.0.3 | 2.899 total | 2.682 total | 2.696 total | 2.76 total |
+
 ## Why
 
 I was sick of waiting forever for the arp / nmap commands to work single-threaded. 
