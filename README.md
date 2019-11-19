@@ -27,7 +27,7 @@ Also, arp only works for devices you have seen previously, so you could easily m
 
 The application asks you what ip address or range you want to select. The default tries to figure out your current network and set it as default. Examples are `192.168.1.0/24`, etc. If you want to check just one ip address, you can put that in as well, like `10.2.2.113` for instance.
 
-`sudo findpi 32` the number at the end is the number of threads to use, with the default being 64 will return the following:
+`sudo findpi 32` the number at the end is the number of threads to use, with the default being 48 will return the following:
 
 ```bash
 What network do you want to check? (10.2.2.0/24):
@@ -36,5 +36,8 @@ Found pi: 10.2.2.117
 Found pi: 10.2.2.119
 Found pi: 10.2.2.137
 ```
+## Troubleshooting
+
+1. If you se the threads too high for your system (should be a factor of number of cores) you will start to see timeout errors like the following `QUITTING! dnet: Failed to open device en0`
 
 Enjoy!
