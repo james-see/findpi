@@ -7,7 +7,7 @@ import time
 from subprocess import check_output
 
 
-__version__ = "1.0.4"
+__version__ = "1.0.5"
 
 
 def checkCores():
