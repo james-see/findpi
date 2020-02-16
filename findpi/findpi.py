@@ -1,4 +1,5 @@
 """Uses brand new features of Python 3"""
+import argparse
 from concurrent.futures import ThreadPoolExecutor
 import os
 import socket
@@ -7,7 +8,20 @@ import time
 from subprocess import check_output
 
 
-__version__ = "1.0.5"
+__version__ = "1.0.6"
+
+
+def prep():
+    """
+    Get the args and set them.
+    """
+    parser = argparse.ArgumentParser(description='Get args properly.')
+    parser.add_argument('-c', '--cores', type=int,
+                        help='cores to use for threads', dest="cores")
+    parser.add_argument('-v', '--version', action='version',
+                        version="%(prog)s ("+__version__+")")
+    args = parser.parse_args()
+    return args
 
 
 def checkCores():
@@ -19,8 +33,10 @@ def checkCores():
     if "Darwin" in str(operatingsystem):
         cores = int(check_output("sysctl -n hw.ncpu", shell=True)) * multiplier
     else:
-        cores = int(check_output("egrep 'cpu cores' /proc/cpuinfo | uniq | egrep -o '[0-9]'")) * multiplier
+        cores = int(check_output(
+            "egrep 'cpu cores' /proc/cpuinfo | uniq | egrep -o '[0-9]'")) * multiplier
     return cores
+
 
 def checkMacs(ip_address):
     """
@@ -50,15 +66,18 @@ logo = """
 
 def main():
     # get current ip hopefully and convert to /24
-    currentip = (([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")] or [[(s.connect(("8.8.8.8", 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) + ["no IP found"])[0]
+    currentip = (([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")] or [[(s.connect(
+        ("8.8.8.8", 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) + ["no IP found"])[0]
     currentip = currentip.rsplit('.', 1)[0] + '.0/24'
     # set sensible default cores count or override from argv below
-    thread_count = checkCores()
+    args = prep()
+    if not args.cores:
+        thread_count = checkCores()
+    else:
+        thread_count = args.cores
     limit = 1
     if not os.geteuid() == 0:
         sys.exit('This script must be run as root (or with \'sudo\')!')
-    if len(sys.argv) > 1:
-        thread_count = int(sys.argv[1])
     currentnum = 1
     userinput = input(
         f'What net to check? (default {currentip}): ') or currentip

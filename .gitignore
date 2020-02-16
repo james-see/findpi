@@ -107,3 +107,4 @@ venv.bak/
 .vscode/
 .vs-code/
 
+*.egg-info
