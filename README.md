@@ -27,7 +27,7 @@ Also, arp only works for devices you have seen previously, so you could easily m
 
 The application asks you what ip address or range you want to select. The default tries to figure out your current network and set it as default. Examples are `192.168.1.0/24`, etc. If you want to check just one ip address, you can put that in as well, like `10.2.2.113` for instance.
 
-`sudo findpi 32` the number at the end is the number of threads to use, with the default being 48 will return the following:
+`sudo findpi -c 32` the number at the end is the number of threads to use, with the default being 4 times whatever cores findpi discovers about your machine, will return the following:
 
 ```bash
 What network do you want to check? (10.2.2.0/24):
