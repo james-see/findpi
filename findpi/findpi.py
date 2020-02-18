@@ -6,9 +6,34 @@ import socket
 import sys
 import time
 from subprocess import check_output
+__version__ = "1.0.7"
 
 
-__version__ = "1.0.6"
+def getInput(currentip, thread_count):
+    """
+    Get user input ip address or use default.
+    """
+    currentnum = 1
+    userinput = input(
+        f'What net to check? (default {currentip}): ') or currentip
+    start_time = time.time()
+    print(f'\nChecking for delicious pi around {userinput}...')
+    if userinput.endswith('/24'):
+        limit = 255
+    if limit == 1:
+        checkip = userinput.rsplit('.', 1)[0] + f'.{currentnum}'
+        checkMacs(checkip)
+        print("--- %s seconds ---" % (time.time() - start_time))
+        sys.exit(0)
+    ip_list = []
+    # nice way to fill up the list with the full range
+    ip_list.extend([userinput.rsplit('.', 1)[0] +
+                    f'.{i}' for i in range(limit)])
+    # multi-threading the modern way ;)
+    with ThreadPoolExecutor(max_workers=thread_count) as executor:
+        {executor.submit(checkMacs, ip) for ip in ip_list}
+    # always print the time it took to complete
+    print("--- %s seconds ---" % (time.time() - start_time))
 
 
 def prep():
@@ -24,9 +49,24 @@ def prep():
     return args
 
 
+def checksudo():
+    if not os.geteuid() == 0:
+        sys.exit('This script must be run as root (or with \'sudo\' or \'doas\' etc.)!')
+
+
+def getip():
+    """
+    get current ip hopefully and convert to /24
+    """
+    currentip = (([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")] or [[(s.connect(
+        ("8.8.8.8", 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) + ["no IP found"])[0]
+    currentip = currentip.rsplit('.', 1)[0] + '.0/24'
+    return currentip
+
+
 def checkCores():
     """
-    Gets the total number of cores and returns sensible default for threads
+    Gets the total number of cores and returns sensible default int for threads
     """
     multiplier = 4  # set this to whatever you want
     operatingsystem = check_output("uname", shell=True)
@@ -65,40 +105,17 @@ logo = """
 
 
 def main():
-    # get current ip hopefully and convert to /24
-    currentip = (([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")] or [[(s.connect(
-        ("8.8.8.8", 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) + ["no IP found"])[0]
-    currentip = currentip.rsplit('.', 1)[0] + '.0/24'
-    # set sensible default cores count or override from argv below
+    """
+    Main function that runs everything.
+    """
+    checksudo()
     args = prep()
+    currentIP = getip()
     if not args.cores:
         thread_count = checkCores()
     else:
         thread_count = args.cores
-    limit = 1
-    if not os.geteuid() == 0:
-        sys.exit('This script must be run as root (or with \'sudo\')!')
-    currentnum = 1
-    userinput = input(
-        f'What net to check? (default {currentip}): ') or currentip
-    start_time = time.time()
-    print(f'\nChecking for delicious pi around {userinput}...')
-    if userinput.endswith('/24'):
-        limit = 255
-    if limit == 1:
-        checkip = userinput.rsplit('.', 1)[0] + f'.{currentnum}'
-        checkMacs(checkip)
-        print("--- %s seconds ---" % (time.time() - start_time))
-        sys.exit(0)
-    ip_list = []
-    # nice way to fill up the list with the full range
-    ip_list.extend([userinput.rsplit('.', 1)[0] +
-                    f'.{i}' for i in range(limit)])
-    # multi-threading the modern way ;)
-    with ThreadPoolExecutor(max_workers=thread_count) as executor:
-        {executor.submit(checkMacs, ip) for ip in ip_list}
-    # always print the time it took to complete
-    print("--- %s seconds ---" % (time.time() - start_time))
+    getInput(currentIP, thread_count)
 
 
 if __name__ == "__main__":
