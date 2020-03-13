@@ -14,14 +14,14 @@ setup(
     packages=["findpi"],
     py_modules=["findpi"],
     keywords=["raspberry", "pi", "network-analysis", "sbc", "nmap"],
-    classifiers=["Programming Language :: Python :: 3 :: Only",
-                 "License :: OSI Approved :: MIT License",
-                 "Operating System :: OS Independant",
-                ],
+    classifiers=[
+        "Programming Language :: Python :: 3 :: Only",
+        "License :: OSI Approved :: MIT License",
+    ],
     install_requires=["pprint", ],
     entry_points={"console_scripts": ["findpi = findpi.findpi:main"]},
     url="https://github.com/jamesacampbell/findpi",
     download_url="https://github.com/jamesacampbell/findpi/archive/{}.tar.gz".format(
-        version
+        __version__
     ),
 )
