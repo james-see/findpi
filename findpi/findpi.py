@@ -6,7 +6,6 @@ import socket
 import sys
 import time
 from subprocess import check_output
-__version__ = "1.0.7"
 
 
 def getInput(currentip, thread_count):

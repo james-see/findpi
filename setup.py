@@ -1,21 +1,23 @@
 from setuptools import setup, find_packages
-import re
+from findpi.__version__ import __version__
 
-version = re.search(
-    '^__version__\s*=\s*"(.*)"', open("findpi/findpi.py").read(), re.M
-).group(1)
 
 setup(
     name="findpi",
     author="James Campbell",
     author_email="james@jamescampbell.us",
-    version=version,
-    license="GPLv3",
-    description="Find pi's on the network fast!",
+    version=__version__,
+    license="MIT",
+    description="Find pi's on the network faster than nmap!",
+    long_description=open("README.md").read(),
+    long_description_content_type="text/markdown",
     packages=["findpi"],
     py_modules=["findpi"],
     keywords=["raspberry", "pi", "network-analysis", "sbc", "nmap"],
-    classifiers=["Programming Language :: Python :: 3 :: Only"],
+    classifiers=["Programming Language :: Python :: 3 :: Only",
+                 "License :: OSI Approved :: MIT License",
+                 "Operating System :: OS Independant",
+                ],
     install_requires=["pprint", ],
     entry_points={"console_scripts": ["findpi = findpi.findpi:main"]},
     url="https://github.com/jamesacampbell/findpi",

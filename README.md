@@ -2,7 +2,7 @@
 
 ## What
 
-Find all the raspberry pi devices on your network really fast using multithreading in Python 3.x and find them fast. 
+Find all the raspberry pi devices on your network really fast using multithreading in Python 3.x and find them fast.
 
 ## Stats
 
@@ -15,7 +15,7 @@ Ok, so to compare this to just running nmap vs. findpi:
 
 ## Why
 
-I was sick of waiting forever for the arp / nmap commands to work single-threaded. 
+I was sick of waiting forever for the arp / nmap commands to work single-threaded.
 
 Also, arp only works for devices you have seen previously, so you could easily miss things.
 
@@ -36,8 +36,7 @@ Found pi: 10.2.2.117
 Found pi: 10.2.2.119
 Found pi: 10.2.2.137
 ```
+
 ## Troubleshooting
 
 1. If you se the threads too high for your system (should be a factor of number of cores) you will start to see timeout errors like the following `QUITTING! dnet: Failed to open device en0`. The mitigation is to lower the number of threads or leave it at the default.
-
-

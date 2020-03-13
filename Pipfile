@@ -9,6 +9,7 @@ autopep8 = "*"
 
 [packages]
 flake8 = "*"
+coverage = "*"
 
 [requires]
 python_version = "3.7"
