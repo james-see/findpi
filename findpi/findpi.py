@@ -6,6 +6,11 @@ import socket
 import sys
 import time
 from subprocess import check_output
+try:
+    from __version__ import __version__
+except:
+    from findpi.__version__ import __version__
+
 
 
 def getInput(currentip, thread_count):
