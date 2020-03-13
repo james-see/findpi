@@ -6,6 +6,7 @@ import socket
 import sys
 import time
 from subprocess import check_output
+from __version__ import __version__
 
 
 def getInput(currentip, thread_count):
@@ -43,7 +44,7 @@ def prep():
     parser.add_argument('-c', '--cores', type=int,
                         help='cores to use for threads', dest="cores")
     parser.add_argument('-v', '--version', action='version',
-                        version="%(prog)s ("+__version__+")")
+                        version=__version__)
     args = parser.parse_args()
     return args
 
