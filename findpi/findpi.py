@@ -77,8 +77,12 @@ def checkCores():
     if "Darwin" in str(operatingsystem):
         cores = int(check_output("sysctl -n hw.ncpu", shell=True)) * multiplier
     else:
-        cores = int(check_output(
-            "egrep 'cpu cores' /proc/cpuinfo | uniq | egrep -o '[0-9]'")) * multiplier
+        try:
+            cores = int(check_output(
+                "cat /proc/cpuinfo | grep processor | wc -l")) * multiplier
+        except:
+            print('Cannot get cores info, defaulting to 4')
+            cores = 4
     return cores
 
 
