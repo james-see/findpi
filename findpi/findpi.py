@@ -80,7 +80,7 @@ def checkCores():
         try:
             with open('/proc/cpuinfo') as f:
                 coredata = f.read()
-            cores = coredata.count('Processor') * multiplier
+            cores = coredata.count('Processor') * 2
         except:
             print('Cannot get cores info, defaulting to 4')
             cores = 4
