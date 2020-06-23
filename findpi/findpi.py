@@ -78,8 +78,9 @@ def checkCores():
         cores = int(check_output("sysctl -n hw.ncpu", shell=True)) * multiplier
     else:
         try:
-            cores = int(check_output(
-                "cat /proc/cpuinfo | grep processor | wc -l")) * multiplier
+            with open('/proc/cpuinfo') as f:
+                coredata = f.read()
+            cores = coredata.count('Processor') * multiplier
         except:
             print('Cannot get cores info, defaulting to 4')
             cores = 4
