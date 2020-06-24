@@ -1,16 +1,16 @@
 """Uses brand new features of Python 3"""
 import argparse
+import threading
 import psutil
 from concurrent.futures import ThreadPoolExecutor
 import os
 import socket
 import sys
 import time
-from subprocess import check_output
 from getmac import get_mac_address
 try:
     from __version__ import __version__
-except:
+except ModuleNotFoundError:
     from findpi.__version__ import __version__
 
 
@@ -37,6 +37,7 @@ def getInput(currentip, thread_count):
     # multi-threading the modern way ;)
     with ThreadPoolExecutor(max_workers=thread_count) as executor:
         {executor.submit(checkMacs, ip) for ip in ip_list}
+        executor.shutdown(wait=False)
     # always print the time it took to complete
     print("--- %s seconds ---" % (time.time() - start_time))
 
@@ -83,18 +84,27 @@ def checkCores():
     return cores
 
 
+def ThreadId(ipaddress, macaddress):
+    """
+    The thread function that gets called from checkMacs to ensure timeout.
+    """
+    macaddress = get_mac_address(ip=ipaddress)
+    if macaddress:
+        if ("b8:27:eb" in str(macaddress.lower())) or ("dc:a6:32" in str(macaddress.lower())):
+            print(f'Found pi: {ipaddress}')
+
+
 def checkMacs(ip_address):
     """
-    checks if mac address found from nmap that matches raspberry pi
+    Checks if mac address found using get_mac_address threaded function.
     Accepts: ip_address var as string
     Returns: nothing
     Prints: found ip of pi if found
     """
-    data = get_mac_address(ip=ip_address)
-    if ("b8:27:eb" in str(data.lower())) or ("dc:a6:32" in str(data.lower())):
-        print(f'Found pi: {ip_address}')
-    else:
-        return
+    macaddress = str()
+    th = threading.Thread(target=ThreadId, args=(ip_address, macaddress))
+    th.start()
+    th.join(timeout=0.5)
     return
 
 
