@@ -10,6 +10,9 @@ autopep8 = "*"
 [packages]
 flake8 = "*"
 coverage = "*"
+getmac = "*"
+pprint = "*"
+psutil = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.8.2"

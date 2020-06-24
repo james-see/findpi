@@ -1,16 +1,17 @@
 """Uses brand new features of Python 3"""
 import argparse
+import psutil
 from concurrent.futures import ThreadPoolExecutor
 import os
 import socket
 import sys
 import time
 from subprocess import check_output
+from getmac import get_mac_address
 try:
     from __version__ import __version__
 except:
     from findpi.__version__ import __version__
-
 
 
 def getInput(currentip, thread_count):
@@ -44,7 +45,7 @@ def prep():
     """
     Get the args and set them.
     """
-    parser = argparse.ArgumentParser(description='Get args properly.')
+    parser = argparse.ArgumentParser(description='Ways to run findpi.')
     parser.add_argument('-c', '--cores', type=int,
                         help='cores to use for threads', dest="cores")
     parser.add_argument('-v', '--version', action='version',
@@ -55,7 +56,8 @@ def prep():
 
 def checksudo():
     if not os.geteuid() == 0:
-        sys.exit('This script must be run as root (or with \'sudo\' or \'doas\' etc.)!')
+        sys.exit(
+            'This script must be run as root (or with \'sudo\' or \'doas\' etc.)!')
 
 
 def getip():
@@ -73,17 +75,11 @@ def checkCores():
     Gets the total number of cores and returns sensible default int for threads
     """
     multiplier = 4  # set this to whatever you want
-    operatingsystem = check_output("uname", shell=True)
-    if "Darwin" in str(operatingsystem):
-        cores = int(check_output("sysctl -n hw.ncpu", shell=True)) * multiplier
-    else:
-        try:
-            with open('/proc/cpuinfo') as f:
-                coredata = f.read()
-            cores = coredata.count('Processor') * 2
-        except:
-            print('Cannot get cores info, defaulting to 4')
-            cores = 4
+    try:
+        cores = psutil.cpu_count() * multiplier
+    except:
+        print('Cannot get cores info, defaulting to 4')
+        cores = 4
     return cores
 
 
@@ -94,8 +90,8 @@ def checkMacs(ip_address):
     Returns: nothing
     Prints: found ip of pi if found
     """
-    data = check_output(f"nmap -sP {ip_address}", shell=True)
-    if ("B8:27:EB" in str(data)) or ("DC:A6:32" in str(data)):
+    data = get_mac_address(ip=ip_address)
+    if ("b8:27:eb" in str(data.lower())) or ("dc:a6:32" in str(data.lower())):
         print(f'Found pi: {ip_address}')
     else:
         return
@@ -117,8 +113,8 @@ def main():
     """
     Main function that runs everything.
     """
-    checksudo()
     args = prep()
+    checksudo()
     currentIP = getip()
     if not args.cores:
         thread_count = checkCores()

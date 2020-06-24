@@ -18,7 +18,7 @@ setup(
         "Programming Language :: Python :: 3 :: Only",
         "License :: OSI Approved :: MIT License",
     ],
-    install_requires=["pprint", ],
+    install_requires=["pprint", "getmac", "psutil"],
     entry_points={"console_scripts": ["findpi = findpi.findpi:main"]},
     url="https://github.com/jamesacampbell/findpi",
     download_url="https://github.com/jamesacampbell/findpi/archive/{}.tar.gz".format(
