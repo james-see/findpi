@@ -7,6 +7,7 @@ import os
 import socket
 import sys
 import time
+import platform
 from getmac import get_mac_address
 try:
     from __version__ import __version__
@@ -56,6 +57,10 @@ def prep():
 
 
 def checksudo():
+    # os.getuid() seems to be only in linux/unix systems, if platform is 'Windows' just skip the check sudo
+    if platform.system() == 'Windows':
+        return
+    
     if not os.geteuid() == 0:
         sys.exit(
             'This script must be run as root (or with \'sudo\' or \'doas\' etc.)!')
