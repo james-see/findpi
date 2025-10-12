@@ -18,28 +18,52 @@ except ModuleNotFoundError:
 def getInput(currentip, thread_count):
     """
     Get user input ip address or use default.
+    Supports CIDR notation for different subnet sizes.
     """
-    currentnum = 1
     userinput = input(
         f'What net to check? (default {currentip}): ') or currentip
     start_time = time.time()
     print(f'\nChecking for delicious pi around {userinput}...')
-    if userinput.endswith('/24'):
-        limit = 255
-    if limit == 1:
-        checkip = userinput.rsplit('.', 1)[0] + f'.{currentnum}'
-        checkMacs(checkip)
+
+    # Parse CIDR notation
+    if '/' in userinput:
+        network_part, cidr_part = userinput.split('/')
+        try:
+            cidr = int(cidr_part)
+        except ValueError:
+            print("Invalid CIDR notation, defaulting to /24")
+            network_part = userinput
+            cidr = 24
+    else:
+        # Assume /24 if no CIDR provided
+        network_part = userinput
+        cidr = 24
+
+    if cidr < 24:
+        print(f"Warning: Large subnet /{cidr} may take a long time to scan")
+    elif cidr > 30:
+        print(f"Small subnet /{cidr} - checking single host")
+
+    # Calculate number of hosts to scan
+    host_bits = 32 - cidr
+    limit = 2 ** host_bits - 2  # Exclude network and broadcast addresses
+
+    if limit <= 0:
+        # Single host scan
+        checkMacs(network_part)
         print("--- %s seconds ---" % (time.time() - start_time))
-        sys.exit(0)
-    ip_list = []
-    # nice way to fill up the list with the full range
-    ip_list.extend([userinput.rsplit('.', 1)[0] +
-                    f'.{i}' for i in range(limit)])
-    # multi-threading the modern way ;)
+        return
+
+    # Generate IP list
+    base_ip = network_part.rsplit('.', 1)[0]
+    start_host = 1 if cidr >= 24 else 0  # Start from .1 for /24+, .0 for larger subnets
+    ip_list = [f"{base_ip}.{i}" for i in range(start_host, limit + start_host + 1)]
+
+    # Multi-threading the modern way ;)
     with ThreadPoolExecutor(max_workers=thread_count) as executor:
         {executor.submit(checkMacs, ip) for ip in ip_list}
         executor.shutdown(wait=False)
-    # always print the time it took to complete
+    # Always print the time it took to complete
     print("--- %s seconds ---" % (time.time() - start_time))
 
 
@@ -68,12 +92,29 @@ def checksudo():
 
 def getip():
     """
-    get current ip hopefully and convert to /24
+    Get current IP address and convert to /24 subnet.
+    Returns the current network in CIDR notation.
     """
-    currentip = (([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")] or [[(s.connect(
-        ("8.8.8.8", 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) + ["no IP found"])[0]
-    currentip = currentip.rsplit('.', 1)[0] + '.0/24'
-    return currentip
+    try:
+        # Try to get IP from hostname resolution
+        hostname_ips = socket.gethostbyname_ex(socket.gethostname())[2]
+        for ip in hostname_ips:
+            if not ip.startswith("127."):
+                return ip.rsplit('.', 1)[0] + '.0/24'
+    except (socket.gaierror, IndexError):
+        pass
+
+    # Fallback: connect to external DNS server to get local IP
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(("8.8.8.8", 53))
+            local_ip = s.getsockname()[0]
+            return local_ip.rsplit('.', 1)[0] + '.0/24'
+    except (OSError, IndexError):
+        pass
+
+    # Final fallback
+    return "192.168.1.0/24"
 
 
 def checkCores():
@@ -95,7 +136,14 @@ def ThreadId(ipaddress, macaddress):
     """
     macaddress = get_mac_address(ip=ipaddress)
     if macaddress:
-        if ("b8:27:eb" in str(macaddress.lower())) or ("dc:a6:32" in str(macaddress.lower())):
+        mac_lower = str(macaddress.lower())
+        # Raspberry Pi MAC address prefixes for all models
+        pi_prefixes = [
+            "b8:27:eb",  # Raspberry Pi 1, 2, 3, Zero (original)
+            "dc:a6:32",  # Raspberry Pi 3, Zero W, Pi 5, Zero 2 W
+            "e4:5f:01",  # Raspberry Pi 4, 400
+        ]
+        if any(prefix in mac_lower for prefix in pi_prefixes):
             print(f'Found pi: {ipaddress}')
 
 

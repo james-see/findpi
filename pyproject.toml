@@ -1,0 +1,52 @@
+[project]
+name = "findpi"
+version = "1.2.0"
+description = "Find Raspberry Pi devices on the network faster than nmap!"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "James Campbell", email = "james@jamescampbell.us"},
+]
+keywords = ["raspberry", "pi", "network-analysis", "sbc", "nmap"]
+classifiers = [
+    "Programming Language :: Python :: 3 :: Only",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: System Administrators",
+    "Intended Audience :: Developers",
+    "Topic :: System :: Networking",
+    "Topic :: System :: Systems Administration",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "getmac>=0.9.4",
+    "psutil>=5.9.0",
+]
+
+[project.scripts]
+findpi = "findpi.findpi:main"
+
+[project.urls]
+Homepage = "https://github.com/james-see/findpi"
+Repository = "https://github.com/james-see/findpi"
+Issues = "https://github.com/james-see/findpi/issues"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["findpi"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=7.0.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "mypy>=1.0.0",
+    "twine>=4.0.0",
+]
