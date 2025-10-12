@@ -3,13 +3,19 @@ name: Release and Publish to PyPI
 on:
   release:
     types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -26,6 +32,9 @@ jobs:
 
     - name: Build package
       run: uv build
+
+    - name: List dist contents
+      run: ls -la dist/
 
     - name: Publish to PyPI
       env:
