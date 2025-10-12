@@ -3,6 +3,9 @@ name: Release and Publish to PyPI
 on:
   release:
     types: [published]
+  push:
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 permissions:
@@ -33,10 +36,26 @@ jobs:
     - name: Build package
       run: uv build
 
+    - name: Install twine
+      run: uv add twine --dev
+
+    - name: Verify version matches tag
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        TAG_VERSION=$(echo $GITHUB_REF | sed 's|refs/tags/v||')
+        PACKAGE_VERSION=$(uv run python -c "import findpi; print(findpi.__version__)")
+        echo "Tag version: $TAG_VERSION"
+        echo "Package version: $PACKAGE_VERSION"
+        if [ "$TAG_VERSION" != "$PACKAGE_VERSION" ]; then
+          echo "Version mismatch: tag=$TAG_VERSION, package=$PACKAGE_VERSION"
+          exit 1
+        fi
+
     - name: List dist contents
       run: ls -la dist/
 
     - name: Publish to PyPI
+      if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'release'
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
