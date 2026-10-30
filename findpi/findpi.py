@@ -1,18 +1,18 @@
 """Uses brand new features of Python 3"""
+
 import argparse
-import threading
-import psutil
-from concurrent.futures import ThreadPoolExecutor
 import os
+import platform
 import socket
 import sys
+import threading
 import time
-import platform
+from concurrent.futures import ThreadPoolExecutor
+
+import psutil
 from getmac import get_mac_address
-try:
-    from __version__ import __version__
-except ModuleNotFoundError:
-    from findpi.__version__ import __version__
+
+from .__version__ import __version__
 
 
 def getInput(currentip, thread_count):
@@ -20,14 +20,13 @@ def getInput(currentip, thread_count):
     Get user input ip address or use default.
     Supports CIDR notation for different subnet sizes.
     """
-    userinput = input(
-        f'What net to check? (default {currentip}): ') or currentip
+    userinput = input(f"What net to check? (default {currentip}): ") or currentip
     start_time = time.time()
-    print(f'\nChecking for delicious pi around {userinput}...')
+    print(f"\nChecking for delicious pi around {userinput}...")
 
     # Parse CIDR notation
-    if '/' in userinput:
-        network_part, cidr_part = userinput.split('/')
+    if "/" in userinput:
+        network_part, cidr_part = userinput.split("/")
         try:
             cidr = int(cidr_part)
         except ValueError:
@@ -46,7 +45,7 @@ def getInput(currentip, thread_count):
 
     # Calculate number of hosts to scan
     host_bits = 32 - cidr
-    limit = 2 ** host_bits - 2  # Exclude network and broadcast addresses
+    limit = 2**host_bits - 2  # Exclude network and broadcast addresses
 
     if limit <= 0:
         # Single host scan
@@ -55,14 +54,13 @@ def getInput(currentip, thread_count):
         return
 
     # Generate IP list
-    base_ip = network_part.rsplit('.', 1)[0]
+    base_ip = network_part.rsplit(".", 1)[0]
     start_host = 1 if cidr >= 24 else 0  # Start from .1 for /24+, .0 for larger subnets
     ip_list = [f"{base_ip}.{i}" for i in range(start_host, limit + start_host + 1)]
 
     # Multi-threading the modern way ;)
     with ThreadPoolExecutor(max_workers=thread_count) as executor:
         {executor.submit(checkMacs, ip) for ip in ip_list}
-        executor.shutdown(wait=False)
     # Always print the time it took to complete
     print("--- %s seconds ---" % (time.time() - start_time))
 
@@ -71,23 +69,20 @@ def prep():
     """
     Get the args and set them.
     """
-    parser = argparse.ArgumentParser(description='Ways to run findpi.')
-    parser.add_argument('-c', '--cores', type=int,
-                        help='cores to use for threads', dest="cores")
-    parser.add_argument('-v', '--version', action='version',
-                        version=__version__)
+    parser = argparse.ArgumentParser(description="Ways to run findpi.")
+    parser.add_argument("-c", "--cores", type=int, help="cores to use for threads", dest="cores")
+    parser.add_argument("-v", "--version", action="version", version=__version__)
     args = parser.parse_args()
     return args
 
 
 def checksudo():
     # os.getuid() seems to be only in linux/unix systems, if platform is 'Windows' just skip the check sudo
-    if platform.system() == 'Windows':
+    if platform.system() == "Windows":
         return
-    
-    if not os.geteuid() == 0:
-        sys.exit(
-            'This script must be run as root (or with \'sudo\' or \'doas\' etc.)!')
+
+    if os.geteuid() != 0:
+        sys.exit("This script must be run as root (or with 'sudo' or 'doas' etc.)!")
 
 
 def getip():
@@ -100,7 +95,7 @@ def getip():
         hostname_ips = socket.gethostbyname_ex(socket.gethostname())[2]
         for ip in hostname_ips:
             if not ip.startswith("127."):
-                return ip.rsplit('.', 1)[0] + '.0/24'
+                return ip.rsplit(".", 1)[0] + ".0/24"
     except (socket.gaierror, IndexError):
         pass
 
@@ -109,7 +104,7 @@ def getip():
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
             s.connect(("8.8.8.8", 53))
             local_ip = s.getsockname()[0]
-            return local_ip.rsplit('.', 1)[0] + '.0/24'
+            return local_ip.rsplit(".", 1)[0] + ".0/24"
     except (OSError, IndexError):
         pass
 
@@ -124,8 +119,8 @@ def checkCores():
     multiplier = 4  # set this to whatever you want
     try:
         cores = psutil.cpu_count() * multiplier
-    except:
-        print('Cannot get cores info, defaulting to 4')
+    except (AttributeError, TypeError, OSError):
+        print("Cannot get cores info, defaulting to 4")
         cores = 4
     return cores
 
@@ -144,7 +139,7 @@ def ThreadId(ipaddress, macaddress):
             "e4:5f:01",  # Raspberry Pi 4, 400
         ]
         if any(prefix in mac_lower for prefix in pi_prefixes):
-            print(f'Found pi: {ipaddress}')
+            print(f"Found pi: {ipaddress}")
 
 
 def checkMacs(ip_address):
@@ -154,14 +149,14 @@ def checkMacs(ip_address):
     Returns: nothing
     Prints: found ip of pi if found
     """
-    macaddress = str()
+    macaddress = ""
     th = threading.Thread(target=ThreadId, args=(ip_address, macaddress))
     th.start()
     th.join(timeout=0.5)
     return
 
 
-logo = """
+logo = r"""
   ______ _____ _   _ _____  _____ _____
  |  ____|_   _| \ | |  __ \|  __ \_   _|
  | |__    | | |  \| | |  | | |__) || |
@@ -179,10 +174,7 @@ def main():
     args = prep()
     checksudo()
     currentIP = getip()
-    if not args.cores:
-        thread_count = checkCores()
-    else:
-        thread_count = args.cores
+    thread_count = checkCores() if not args.cores else args.cores
     getInput(currentIP, thread_count)
 
 

@@ -1,40 +1,56 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "findpi"
-version = "1.2.2"
+version = "1.2.3"
 description = "Find Raspberry Pi devices on the network faster than nmap!"
 readme = "README.md"
 license = {text = "MIT"}
 authors = [
     {name = "James Campbell", email = "james@jamescampbell.us"},
 ]
-keywords = ["raspberry", "pi", "network-analysis", "sbc", "nmap"]
+maintainers = [
+    {name = "James Campbell", email = "james@jamescampbell.us"},
+]
+keywords = ["raspberry", "pi", "network-analysis", "sbc", "nmap", "scanner"]
 classifiers = [
-    "Programming Language :: Python :: 3 :: Only",
+    "Development Status :: 5 - Production/Stable",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
-    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: System Administrators",
     "Intended Audience :: Developers",
     "Topic :: System :: Networking",
     "Topic :: System :: Systems Administration",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 dependencies = [
-    "getmac>=0.9.4",
-    "psutil>=5.9.0",
+    "getmac>=0.9.4,<2",
+    "psutil>=5.9.0,<8",
 ]
 
 [project.scripts]
-findpi = "findpi.findpi:main"
+findpi = "findpi.__main__:main"
 
 [project.urls]
 Homepage = "https://github.com/james-see/findpi"
 Repository = "https://github.com/james-see/findpi"
 Issues = "https://github.com/james-see/findpi/issues"
 
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "ruff>=0.6",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["findpi"]
@@ -42,11 +58,28 @@ packages = ["findpi"]
 [tool.hatch.metadata]
 allow-direct-references = true
 
-[tool.uv]
-dev-dependencies = [
-    "pytest>=7.0.0",
-    "black>=23.0.0",
-    "isort>=5.12.0",
-    "mypy>=1.0.0",
-    "twine>=4.0.0",
-]
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+addopts = "-q"
+
+[tool.coverage.run]
+branch = true
+source = ["findpi"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "SIM"]
+ignore = ["E501", "N802", "N806"]
+fixable = ["ALL"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
